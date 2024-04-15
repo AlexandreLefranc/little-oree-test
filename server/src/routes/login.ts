@@ -3,6 +3,7 @@ import { Router, Response, Request } from "express";
 import { validateLoginBody } from "../services/login.js";
 import { pool } from "../services/poolClient.js";
 import { checkPassword } from "../services/crypto.js";
+import { generateJwt } from "../services/jwt.js";
 const router = Router();
 
 // Local interfaces declaration
@@ -36,8 +37,6 @@ export default router.post(
     res: Response<IResponse>
   ) => {
     try {
-      console.log({req: req.body});
-
       // validate body
       const validBody = validateLoginBody(req.body);
       if (!validBody) {
@@ -59,17 +58,15 @@ export default router.post(
 
       const user = users.rows[0];
 
-      console.log({user})
-
       // check password
       const validPassword = checkPassword(req.body.password, user);
       if (!validPassword) {
         return res.status(401).send({ message: "Invalid password" });
       }
 
-      // generate jwt
-      // return
-      return res.status(500).send({ message: "OK" });
+      const token = generateJwt();
+
+      return res.status(200).send({ token, userId: user.user_id });
     } catch (error) {
       console.error(error);
       return res.status(500).send({ message: "A server error occured" });
