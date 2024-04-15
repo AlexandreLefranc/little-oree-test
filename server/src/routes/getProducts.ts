@@ -29,7 +29,7 @@ export default router.get(
       return res.status(200).send(products.rows);
     } catch (error) {
       console.error(error);
-      return res.status(404).send({ message: "A server error occured" });
+      return res.status(500).send({ message: "A server error occured" });
     }
   }
 );
